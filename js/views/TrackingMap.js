@@ -1,26 +1,39 @@
-import React from 'react';
-import {View, Button, Text} from 'react-native';
+import React, {useState, useRef} from 'react';
+import {SafeAreaView, StyleSheet, View, Text, Button} from 'react-native';
 
-export default function TrackingMap({navigation}) {
-  const [count, setCount] = React.useState(0);
+import Map from '../components/Map';
+import useBackground from '../hooks/useBackground';
 
-  // Example how to add a header button
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button onPress={() => setCount((c) => c + 1)} title="Count" />
-      ),
-    });
-  }, [navigation]);
+const TrackingMap = () => {
+  const {coordinates, BackgroundGeolocation} = useBackground();
+
+  const mapRef = useRef();
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <Text style={{fontSize: 100}}>{count}</Text>
-    </View>
+    <SafeAreaView style={styles.Conatiner}>
+      <Map ref={mapRef} location={coordinates} />
+    </SafeAreaView>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  Conatiner: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  Label: {
+    fontSize: 24,
+  },
+  Footer: {
+    position: 'absolute',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    width: '90%',
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    bottom: 30,
+  },
+});
+
+export default TrackingMap;

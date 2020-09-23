@@ -1,0 +1,12 @@
+
+Error Android cuando se installa google maps y falla background geolocation.
+didn´t find class  androidx.localbroadcastmanager.content
+
+Solucion:
+https://github.com/transistorsoft/react-native-background-geolocation/issues/1017
+
+Add following to your android/app/build.gradle:
+
+dependencies {  
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+}
