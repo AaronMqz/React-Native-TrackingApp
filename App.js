@@ -1,16 +1,18 @@
 import React from 'react';
-import {SafeAreaView, StatusBar} from 'react-native';
-import BgTracking from './js/Background';
+import {SafeAreaView, StatusBar, View, Text} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <BgTracking />
-      </SafeAreaView>
-    </>
-  );
-};
+import useBackground from './js/hooks/useBackground';
+import Navigation from './js/navigation';
 
-export default App;
+let WithNavigation = () => (
+  <NavigationContainer>
+    <Navigation />
+  </NavigationContainer>
+);
+
+export default function App() {
+  const {coordinates, BackgroundGeolocation} = useBackground();
+
+  return <WithNavigation />;
+}

@@ -1,9 +1,14 @@
-import React, {Component} from 'react';
-import {Alert, View, Text, Platform} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Alert, Platform} from 'react-native';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 
-class BgTracking extends Component {
-  componentDidMount() {
+const useBackground = () => {
+  const [coordinates, SetCoordinates] = useState({
+    latitude: 0,
+    longitude: 0,
+  });
+
+  useEffect(() => {
     BackgroundGeolocation.configure({
       desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
       stationaryRadius: 50,
@@ -18,23 +23,29 @@ class BgTracking extends Component {
       fastestInterval: 5000,
       activitiesInterval: 10000,
       stopOnStillActivity: false,
-      url: 'http://192.168.81.15:3000/location',
-      httpHeaders: {
-        'X-FOO': 'bar',
-      },
+      pauseLocationUpdates: false,
+      saveBatteryOnBackground: false,
+      //url: 'http://192.168.81.15:3000/location',
+      //httpHeaders: {
+      //  'X-FOO': 'bar',
+      //},
       // customize post properties
-      postTemplate: {
-        lat: '@latitude',
-        lon: '@longitude',
-        foo: 'bar', // you can also add your own properties
-      },
+      //postTemplate: {
+      //  lat: '@latitude',
+      //  lon: '@longitude',
+      //  foo: 'bar', // you can also add your own properties
+      //}
     });
 
     BackgroundGeolocation.on('location', (location) => {
       // handle your locations here
       // to perform long running operation on iOS
       // you need to create background task
-      console.log('que pedo - ' + Platform.OS, location);
+      SetCoordinates({
+        latitude: location.latitude,
+        longitude: location.longitude,
+      });
+      console.log('que pedo3 - ' + Platform.OS, location);
 
       BackgroundGeolocation.startTask((taskKey) => {
         // execute long running task
@@ -42,23 +53,6 @@ class BgTracking extends Component {
         // IMPORTANT: task has to be ended by endTask
         BackgroundGeolocation.endTask(taskKey);
       });
-    });
-
-    BackgroundGeolocation.on('stationary', (stationaryLocation) => {
-      // handle stationary locations here
-      //Actions.sendLocation(stationaryLocation);
-    });
-
-    BackgroundGeolocation.on('error', (error) => {
-      console.log('[ERROR] BackgroundGeolocation error:', error);
-    });
-
-    BackgroundGeolocation.on('start', () => {
-      console.log('[INFO] BackgroundGeolocation service has been started');
-    });
-
-    BackgroundGeolocation.on('stop', () => {
-      console.log('[INFO] BackgroundGeolocation service has been stopped');
     });
 
     BackgroundGeolocation.on('authorization', (status) => {
@@ -97,19 +91,6 @@ class BgTracking extends Component {
       console.log('[INFO] App is in foreground');
     });
 
-    BackgroundGeolocation.on('abort_requested', () => {
-      console.log('[INFO] Server responded with 285 Updates Not Required');
-
-      // Here we can decide whether we want stop the updates or not.
-      // If you've configured the server to return 285, then it means the server does not require further update.
-      // So the normal thing to do here would be to `BackgroundGeolocation.stop()`.
-      // But you might be counting on it to receive location updates in the UI, so you could just reconfigure and set `url` to null.
-    });
-
-    BackgroundGeolocation.on('http_authorization', () => {
-      console.log('[INFO] App needs to authorize the http requests');
-    });
-
     BackgroundGeolocation.checkStatus((status) => {
       console.log(
         '[INFO] BackgroundGeolocation service is running',
@@ -129,22 +110,13 @@ class BgTracking extends Component {
       }
     });
 
-    // you can also just start without checking for status
-    // BackgroundGeolocation.start();
-  }
+    return () => {
+      console.log('removiendo listeners');
+      BackgroundGeolocation.removeAllListeners();
+    };
+  }, []);
 
-  componentWillUnmount() {
-    // unregister all event listeners
-    BackgroundGeolocation.removeAllListeners();
-  }
+  return {coordinates, BackgroundGeolocation};
+};
 
-  render() {
-    return (
-      <View>
-        <Text>que pedo</Text>
-      </View>
-    );
-  }
-}
-
-export default BgTracking;
+export default useBackground;
