@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, forwardRef, useImperativeHandle} from 'react';
 import {View, StyleSheet, Dimensions} from 'react-native';
 import MapView, {PROVIDER_GOOGLE, Marker, Polyline} from 'react-native-maps';
+import ViewShot from 'react-native-view-shot';
 
 const {width, height} = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -17,6 +18,7 @@ const initialRegion = {
 
 const Map = forwardRef(({location}, ref) => {
   const mapRef = useRef();
+  const mapRef2 = useRef();
 
   const setRegion = () => {
     return {
@@ -31,6 +33,14 @@ const Map = forwardRef(({location}, ref) => {
     center() {
       mapRef.current.animateToRegion(setRegion(), 1000);
     },
+    takeSnapShot(callback) {
+      mapRef2.current.capture().then((uri) => {
+        return callback(uri);
+      });
+    },
+    /*
+    // Only works for iOS
+    // Error in Android :(
     takeSnapShot(callback) {
       mapRef.current.takeSnapshot(
         300,
@@ -49,7 +59,7 @@ const Map = forwardRef(({location}, ref) => {
           return callback(data.uri);
         },
       );
-    },
+    },*/
   }));
 
   useEffect(() => {
@@ -61,16 +71,17 @@ const Map = forwardRef(({location}, ref) => {
   return (
     <View style={styles.container}>
       {location.longitude !== 0 && (
-        <MapView
-          ref={mapRef}
-          provider={PROVIDER_GOOGLE}
-          style={styles.mapStyle}
-          initialRegion={initialRegion}
-          showsUserLocation={true}
-          onMapReady={() => {
-            mapRef.current.animateToRegion(setRegion(), 2000);
-          }}>
-          {/*
+        <ViewShot ref={mapRef2}>
+          <MapView
+            ref={mapRef}
+            provider={PROVIDER_GOOGLE}
+            style={styles.mapStyle}
+            initialRegion={initialRegion}
+            showsUserLocation={true}
+            onMapReady={() => {
+              mapRef.current.animateToRegion(setRegion(), 2000);
+            }}>
+            {/*
         <Marker
         identifier={'1'}
         coordinate={{
@@ -78,10 +89,14 @@ const Map = forwardRef(({location}, ref) => {
           longitude: location.longitude,
         }}
       />*/}
-          {location.startTracking && (
-            <Polyline coordinates={location.routeCoordinates} strokeWidth={5} />
-          )}
-        </MapView>
+            {location.startTracking && (
+              <Polyline
+                coordinates={location.routeCoordinates}
+                strokeWidth={5}
+              />
+            )}
+          </MapView>
+        </ViewShot>
       )}
     </View>
   );

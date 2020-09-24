@@ -37,7 +37,6 @@ const CreateStack = (views) => {
     return (
       <Stack.Navigator>
         {views.map((view, index) => {
-          console.log('puto', view.options);
           return (
             <Stack.Screen
               key={index}

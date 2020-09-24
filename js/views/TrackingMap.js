@@ -1,17 +1,78 @@
 import React, {useState, useRef} from 'react';
 import {SafeAreaView, StyleSheet, View, Text, Button} from 'react-native';
+import {connect} from 'react-redux';
 
 import Map from '../components/Map';
-import useBackground from '../hooks/useBackground';
+import useLocation from '../hooks/useLocation';
+import {saveRoutesAction} from '../redux/routesDuck';
 
-const TrackingMap = () => {
-  const {coordinates, BackgroundGeolocation} = useBackground();
-
+const TrackingMap = ({saveRoutesAction}) => {
+  const {
+    stateLocation,
+    stopTracking,
+    startTracking,
+    clearTracking,
+  } = useLocation();
+  const [toogle, setToggle] = useState(true);
   const mapRef = useRef();
+  const mapRef2 = useRef();
+
+  const handleButton = () => {
+    setToggle(!toogle);
+    if (toogle) {
+      startTracking();
+    } else {
+      stopTracking();
+      // Take snapShot of the tracking
+      // Works for iOS and Android
+      mapRef.current.takeSnapShot((data) => {
+        let mapRoute = {
+          title: 'test',
+          distance: stateLocation.distanceTravelled,
+          time: '3min',
+          img: data,
+          routes: stateLocation.routeCoordinates,
+        };
+        saveRoutesAction(mapRoute);
+        clearTracking();
+      });
+      /*
+      // Only works for iOS
+      // Error in Android :(
+      mapRef.current.takeSnapShot((data) => {
+        let mapRoute = {
+          title: 'test',
+          distance: stateLocation.distanceTravelled,
+          time: '3min',
+          img: data,
+          routes: stateLocation.routeCoordinates,
+        };
+        saveRoutesAction(mapRoute);
+        clearTracking();
+      });*/
+    }
+  };
 
   return (
     <SafeAreaView style={styles.Conatiner}>
-      <Map ref={mapRef} location={coordinates} />
+      <Map ref={mapRef} ref2={mapRef2} location={stateLocation} />
+      <View style={styles.Footer}>
+        <Text>
+          Distancia: {stateLocation.distanceTravelled}{' '}
+          {stateLocation.distanceTravelled === 1000 ? 'km' : 'm'}
+        </Text>
+        <Button
+          onPress={() => handleButton()}
+          title={toogle ? 'Start' : 'Stop'}
+        />
+        <Button
+          style={styles.Footer}
+          onPress={() => {
+            mapRef.current.center();
+          }}
+          title={'Ubicacion'}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -36,4 +97,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TrackingMap;
+export default connect(null, {saveRoutesAction})(TrackingMap);

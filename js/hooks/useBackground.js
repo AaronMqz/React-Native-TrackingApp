@@ -15,7 +15,7 @@ const useBackground = () => {
       distanceFilter: 2,
       notificationTitle: 'Background tracking',
       //notificationText: 'enabled',
-      //debug: null,
+      debug: false,
       startOnBoot: false,
       stopOnTerminate: true,
       locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,
@@ -24,7 +24,7 @@ const useBackground = () => {
       activitiesInterval: 10000,
       stopOnStillActivity: false,
       pauseLocationUpdates: false,
-      saveBatteryOnBackground: false,
+      saveBatteryOnBackground: true,
       //url: 'http://192.168.81.15:3000/location',
       //httpHeaders: {
       //  'X-FOO': 'bar',
@@ -45,7 +45,7 @@ const useBackground = () => {
         latitude: location.latitude,
         longitude: location.longitude,
       });
-      console.log('que pedo3 - ' + Platform.OS, location);
+      console.log('background location: ' + Platform.OS, location);
 
       BackgroundGeolocation.startTask((taskKey) => {
         // execute long running task
@@ -53,6 +53,14 @@ const useBackground = () => {
         // IMPORTANT: task has to be ended by endTask
         BackgroundGeolocation.endTask(taskKey);
       });
+    });
+
+    BackgroundGeolocation.on('error', (error) => {
+      console.log('[ERROR] BackgroundGeolocation error:', error);
+    });
+
+    BackgroundGeolocation.on('stop', () => {
+      console.log('[INFO] BackgroundGeolocation service has been stopped');
     });
 
     BackgroundGeolocation.on('authorization', (status) => {
@@ -106,7 +114,7 @@ const useBackground = () => {
 
       // you don't need to check status before start (this is just the example)
       if (!status.isRunning) {
-        BackgroundGeolocation.start(); //triggers start on start event
+        //BackgroundGeolocation.start(); //triggers start on start event
       }
     });
 

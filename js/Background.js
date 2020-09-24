@@ -34,7 +34,7 @@ class BgTracking extends Component {
       // handle your locations here
       // to perform long running operation on iOS
       // you need to create background task
-      console.log('que pedo - ' + Platform.OS, location);
+      console.log('background location: ' + Platform.OS, location);
 
       BackgroundGeolocation.startTask((taskKey) => {
         // execute long running task
