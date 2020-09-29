@@ -2,12 +2,14 @@ import React, {useEffect, useReducer} from 'react';
 import {getDistance} from 'geolib';
 
 import useBackground from '../hooks/useBackground';
+import useTimerBackground from '../hooks/useTimerBackground';
 
 const initialState = {
   latitude: 0,
   longitude: 0,
   routeCoordinates: [],
   distanceTravelled: 0,
+  timing: 0,
   prevLatLng: {},
   startTracking: false,
   status: {},
@@ -21,6 +23,7 @@ const STOP_TRACKING = 'STOP_TRACKING';
 const SAVE_TRACKING = 'SAVE_TRACKING';
 const CLEAR_TRACKING = 'CLEAR_TRACKING';
 const ERROR_LOCATION = 'ERROR_LOCATION';
+const START_TIMING = 'START_TIMING';
 
 const newDistance = ({latitude, longitude}, newCoordinate) => {
   return getDistance(
@@ -58,6 +61,8 @@ const locationReducer = (state, {type, payload}) => {
       return {...state, startTracking: true};
     case STOP_TRACKING:
       return {...state, startTracking: false};
+    case START_TIMING:
+      return {...state, timing: payload};
     case CLEAR_TRACKING:
       return {
         ...state,
@@ -74,17 +79,20 @@ const locationReducer = (state, {type, payload}) => {
 
 const useLocation = () => {
   const {coordinates, BackgroundGeolocation} = useBackground();
+  const {startTiming, stopTiming, timing} = useTimerBackground();
   const [stateLocation, dispatch] = useReducer(locationReducer, initialState);
 
   const stopTracking = () => {
-    BackgroundGeolocation.stop();
+    //BackgroundGeolocation.stop();
     dispatch({type: STOP_TRACKING});
+    stopTiming();
   };
 
   const startTracking = () => {
     if (!stateLocation.isRunning) {
       BackgroundGeolocation.start();
     }
+    startTiming();
     dispatch({type: START_TRACKING});
   };
 
@@ -125,6 +133,10 @@ const useLocation = () => {
       dispatch({type: GET_LOCATION, payload: coordinates});
     }
   }, [coordinates, stateLocation.startTracking]);
+
+  useEffect(() => {
+    dispatch({type: START_TIMING, payload: timing});
+  }, [timing]);
 
   return {
     stateLocation,

@@ -18,7 +18,7 @@ const initialRegion = {
 
 const Map = forwardRef(({location}, ref) => {
   const mapRef = useRef();
-  const mapRef2 = useRef();
+  const viewShotRef = useRef();
 
   const setRegion = () => {
     return {
@@ -34,7 +34,7 @@ const Map = forwardRef(({location}, ref) => {
       mapRef.current.animateToRegion(setRegion(), 1000);
     },
     takeSnapShot(callback) {
-      mapRef2.current.capture().then((uri) => {
+      viewShotRef.current.capture().then((uri) => {
         return callback(uri);
       });
     },
@@ -71,7 +71,7 @@ const Map = forwardRef(({location}, ref) => {
   return (
     <View style={styles.container}>
       {location.longitude !== 0 && (
-        <ViewShot ref={mapRef2}>
+        <ViewShot ref={viewShotRef}>
           <MapView
             ref={mapRef}
             provider={PROVIDER_GOOGLE}

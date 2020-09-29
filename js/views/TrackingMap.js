@@ -1,6 +1,14 @@
 import React, {useState, useRef} from 'react';
-import {SafeAreaView, StyleSheet, View, Text, Button} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Text,
+  Button,
+  TouchableOpacity,
+} from 'react-native';
 import {connect} from 'react-redux';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Map from '../components/Map';
 import useLocation from '../hooks/useLocation';
@@ -15,7 +23,6 @@ const TrackingMap = ({saveRoutesAction}) => {
   } = useLocation();
   const [toogle, setToggle] = useState(true);
   const mapRef = useRef();
-  const mapRef2 = useRef();
 
   const handleButton = () => {
     setToggle(!toogle);
@@ -55,24 +62,32 @@ const TrackingMap = ({saveRoutesAction}) => {
 
   return (
     <SafeAreaView style={styles.Conatiner}>
-      <Map ref={mapRef} ref2={mapRef2} location={stateLocation} />
-      <View style={styles.Footer}>
-        <Text>
-          Distancia: {stateLocation.distanceTravelled}{' '}
-          {stateLocation.distanceTravelled === 1000 ? 'km' : 'm'}
-        </Text>
-        <Button
-          onPress={() => handleButton()}
-          title={toogle ? 'Start' : 'Stop'}
-        />
-        <Button
-          style={styles.Footer}
-          onPress={() => {
-            mapRef.current.center();
-          }}
-          title={'Ubicacion'}
-        />
+      <Map ref={mapRef} location={stateLocation} />
+      <View style={styles.Header}>
+        <View style={styles.HeaderSection}>
+          <Text style={styles.HeaderLabel}>
+            {stateLocation.distanceTravelled}{' '}
+            {stateLocation.distanceTravelled === 1000 ? 'km' : 'm'}
+          </Text>
+          <Text style={styles.HeaderLabelSubtitle}>Distance</Text>
+        </View>
+        <View style={styles.HeaderSection}>
+          <Text style={styles.HeaderLabel}>{stateLocation.timing} </Text>
+          <Text style={styles.HeaderLabelSubtitle}>Time</Text>
+        </View>
       </View>
+      <TouchableOpacity
+        style={styles.ActionButton}
+        onPress={() => handleButton()}>
+        <Text style={styles.ActionLabel}>{toogle ? 'Go' : 'Stop'}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.LocationButton}
+        onPress={() => {
+          mapRef.current.center();
+        }}>
+        <Icon name={'location-arrow'} size={22} color={'#00a680'} />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -83,14 +98,51 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  Label: {
+  ActionLabel: {
     fontSize: 24,
+    color: 'white',
   },
-  Footer: {
+  LocationButton: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    height: 40,
+    width: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    bottom: 30,
+    right: 10,
+    borderRadius: 20,
+  },
+  Header: {
     position: 'absolute',
     backgroundColor: 'rgba(255,255,255,0.9)',
     width: '90%',
+    height: 70,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: 20,
+  },
+  HeaderSection: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: 150,
+  },
+  HeaderLabel: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  HeaderLabelSubtitle: {
+    fontSize: 12,
+  },
+  ActionButton: {
+    position: 'absolute',
+    backgroundColor: '#4caf50',
+    width: 100,
     height: 100,
+    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
     bottom: 30,
