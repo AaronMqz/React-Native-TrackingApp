@@ -1,6 +1,7 @@
-//import useStorage from '../hooks/useStorage';
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
+
+import useStorage from '../hooks/useStorage';
 
 // CONSTANTS
 let initalData = {
@@ -17,7 +18,7 @@ let initalData = {
     },
   ],
 };
-let GET_ROUTES_FETCHING = 'GET_ROUTES_FETCHING';
+let IS_FETCHING = 'IS_FETCHING';
 let GET_ROUTES_SUCCESS = 'GET_ROUTES_SUCCESS';
 let GET_ROUTES_ERROR = 'GET_ROUTES_ERROR';
 let SAVE_ROUTES = 'SAVE_ROUTES';
@@ -26,7 +27,7 @@ let GET_ROUTE_DETAIL = 'GET_ROUTE_DETAIL';
 // REDUCERS
 const reducer = (state = initalData, {type, payload}) => {
   switch (type) {
-    case GET_ROUTES_FETCHING:
+    case IS_FETCHING:
       return {...state, fetching: true};
     case GET_ROUTES_SUCCESS:
       return {
@@ -38,6 +39,7 @@ const reducer = (state = initalData, {type, payload}) => {
       return {
         ...state,
         routes: [...state.routes, payload],
+        fetching: false,
       };
     case GET_ROUTE_DETAIL:
       let current = state.routes.filter((route) => {
@@ -52,14 +54,14 @@ export default reducer;
 
 // ACTIONS - THUNKS
 export let getRoutesAction = () => (dispatch, getState) => {
-  dispatch({type: GET_ROUTES_FETCHING});
+  const {getStorage} = useStorage();
 
-  //const {getStorage} = useStorage();
   let getRoutesFromStorage = async () => {
-    //let routes = await getStorage();
+    dispatch({type: IS_FETCHING});
+    let routes = await getStorage();
     return dispatch({
       type: GET_ROUTES_SUCCESS,
-      payload: getState().routes.routes,
+      payload: routes,
     });
   };
 
@@ -67,13 +69,12 @@ export let getRoutesAction = () => (dispatch, getState) => {
 };
 
 export let saveRoutesAction = (mapRoute) => (dispatch, getState) => {
-  //const {saveStorage} = useStorage();
+  const {saveStorage} = useStorage();
   const saveTracking = async () => {
     mapRoute.id = uuidv4();
     const newRoutes = getState().routes.routes.concat(mapRoute);
-
-    //await saveStorage(newRoutes);
-
+    dispatch({type: IS_FETCHING});
+    await saveStorage(newRoutes);
     dispatch({type: SAVE_ROUTES, payload: mapRoute});
   };
 
@@ -81,6 +82,6 @@ export let saveRoutesAction = (mapRoute) => (dispatch, getState) => {
 };
 
 export let getRouteDetail = (id) => (dispatch, getState) => {
-  dispatch({type: GET_ROUTES_FETCHING});
+  dispatch({type: IS_FETCHING});
   dispatch({type: GET_ROUTE_DETAIL, payload: id});
 };
