@@ -31,10 +31,13 @@ const useTimerBackground = () => {
 
   const stopTiming = () => {
     clearInterval(_interval);
+  };
+
+  const clearTiming = () => {
     setTiming(0);
   };
 
-  return {startTiming, stopTiming, timing};
+  return {startTiming, stopTiming, clearTiming, timing};
 };
 
 export default useTimerBackground;

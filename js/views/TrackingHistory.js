@@ -23,11 +23,19 @@ const TrackingHistory = ({routes}, props) => {
             source={{uri: item.img}}
             style={{width: '100%', height: 100}}
           />
-          <Text>{item.title}</Text>
-          <Text>
-            Distancia: {item.distance} {item.distance === 1000 ? 'km' : 'm'}{' '}
-          </Text>
-          <Text>Tiempo {item.time}</Text>
+          <Text style={styles.CardTitle}>{item.title}</Text>
+          <View style={styles.CardItemContainer}>
+            <View style={styles.CardItem}>
+              <Text style={styles.CardItemTitle}>Distancia</Text>
+              <Text style={styles.CardItemSubTitle}>
+                {item.distance} {item.distance === 1000 ? 'km' : 'm'}
+              </Text>
+            </View>
+            <View style={styles.CardItem}>
+              <Text style={styles.CardItemTitle}>Tiempo</Text>
+              <Text style={styles.CardItemSubTitle}>{item.time}</Text>
+            </View>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -36,7 +44,7 @@ const TrackingHistory = ({routes}, props) => {
   return (
     <SafeAreaView style={styles.Conatiner}>
       <FlatList
-        style={{width: '100%'}}
+        style={styles.FlatList}
         data={routes}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
@@ -51,19 +59,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  FlatList: {
+    width: '100%',
+    paddingTop: 10,
+  },
   Label: {
     fontSize: 24,
   },
   Card: {
     borderStyle: 'solid',
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: 'grey',
+    borderRadius: 10,
+    borderColor: 'white',
     marginBottom: 10,
     marginLeft: 5,
     marginRight: 5,
-    padding: 2,
+
     backgroundColor: 'white',
+  },
+  CardTitle: {
+    marginLeft: 20,
+    fontSize: 18,
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  CardItemContainer: {
+    flexDirection: 'row',
+    marginLeft: 20,
+    justifyContent: 'space-between',
+    width: '50%',
+    paddingBottom: 10,
+  },
+  CardItem: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  CardItemTitle: {
+    fontSize: 10,
+    color: 'grey',
+  },
+  CardItemSubTitle: {
+    fontSize: 18,
   },
 });
 

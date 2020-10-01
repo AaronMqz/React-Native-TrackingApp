@@ -79,7 +79,7 @@ const locationReducer = (state, {type, payload}) => {
 
 const useLocation = () => {
   const {coordinates, BackgroundGeolocation} = useBackground();
-  const {startTiming, stopTiming, timing} = useTimerBackground();
+  const {startTiming, stopTiming, clearTiming, timing} = useTimerBackground();
   const [stateLocation, dispatch] = useReducer(locationReducer, initialState);
 
   const stopTracking = () => {
@@ -98,6 +98,7 @@ const useLocation = () => {
 
   const clearTracking = () => {
     dispatch({type: CLEAR_TRACKING});
+    clearTiming();
   };
 
   const getCurrentLocation = () => {
