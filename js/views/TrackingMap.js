@@ -128,6 +128,7 @@ const TrackingMap = ({saveRoutesAction}) => {
                   time: stateLocation.timing,
                   img: data,
                   routes: stateLocation.routeCoordinates,
+                  datetime: stateLocation.datetime,
                 };
                 saveRoutesAction(mapRoute);
                 clearTracking();

@@ -2,10 +2,10 @@ import React, {useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
-  View,
   Text,
   Image,
-  FlatList,
+  View,
+  ScrollView,
 } from 'react-native';
 import {connect} from 'react-redux';
 import {getRouteDetail} from '../redux/routesDuck';
@@ -14,35 +14,91 @@ const TrackingDetail = ({current, getRouteDetail, route}) => {
   useEffect(() => {
     getRouteDetail(route.params.id);
   }, []);
+
   return (
-    <SafeAreaView style={styles.Conatiner}>
-      <Image source={{uri: current.img}} style={{width: '100%', height: 400}} />
-      <Text>{current.title}</Text>
-      <Text>
-        Distancia: {current.distance} {current.distance === 1000 ? 'km' : 'm'}{' '}
-      </Text>
-      <Text>Tiempo {current.time}</Text>
+    <SafeAreaView style={styles.Container}>
+      <ScrollView style={styles.ContainerScroll}>
+        <View style={styles.DetailContainer}>
+          <View style={styles.DetailItems}>
+            <Text style={styles.TitleName}>{current.title}</Text>
+            <View style={styles.DetailItemRow}>
+              <View style={styles.DetailItemColumn}>
+                <Text style={styles.Title}>Distance</Text>
+                <Text style={styles.Subtitle}>
+                  {current.distance}
+                  {current.distance === 1000 ? ' km' : ' m'}
+                </Text>
+              </View>
+              <View style={styles.DetailItemColumn}>
+                <Text style={styles.Title}>Time</Text>
+                <Text style={styles.Subtitle}>{current.time}</Text>
+              </View>
+              <View style={styles.DetailItemColumn}>
+                <Text style={styles.Title}>Date</Text>
+                <Text style={styles.Subtitle}>{current.datetime}</Text>
+              </View>
+            </View>
+          </View>
+          <Image source={{uri: current.img}} style={styles.DetailImage} />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  Conatiner: {
+  Container: {
     flex: 1,
   },
-  Label: {
-    fontSize: 24,
+  TitleName: {
+    fontSize: 35,
+    color: 'white',
+    fontWeight: 'bold',
   },
-  Card: {
-    borderStyle: 'solid',
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: 'grey',
-    marginBottom: 10,
-    marginLeft: 5,
-    marginRight: 5,
-    padding: 2,
+  Title: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  Subtitle: {
+    fontSize: 20,
+    color: 'white',
+  },
+  ContainerScroll: {
+    paddingTop: 10,
     backgroundColor: 'white',
+  },
+  DetailContainer: {
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 20,
+    borderStyle: 'solid',
+    borderWidth: 0,
+    borderColor: 'white',
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+    borderTopRightRadius: 15,
+    borderTopLeftRadius: 15,
+    backgroundColor: '#2ecc71',
+  },
+  DetailItems: {
+    padding: 15,
+  },
+  DetailItemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
+  DetailItemColumn: {
+    alignItems: 'center',
+  },
+  DetailImage: {
+    width: '100%',
+    height: 700,
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
+    borderBottomRightRadius: 12,
+    borderBottomLeftRadius: 12,
   },
 });
 

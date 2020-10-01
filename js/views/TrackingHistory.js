@@ -19,23 +19,24 @@ const TrackingHistory = ({routes}, props) => {
       <TouchableOpacity
         onPress={() => navigation.navigate('Detail', {id: item.id})}>
         <View style={styles.Card}>
-          <Image
-            source={{uri: item.img}}
-            style={{width: '100%', height: 100}}
-          />
           <Text style={styles.CardTitle}>{item.title}</Text>
           <View style={styles.CardItemContainer}>
             <View style={styles.CardItem}>
-              <Text style={styles.CardItemTitle}>Distancia</Text>
+              <Text style={styles.CardItemTitle}>Distance</Text>
               <Text style={styles.CardItemSubTitle}>
                 {item.distance} {item.distance === 1000 ? 'km' : 'm'}
               </Text>
             </View>
             <View style={styles.CardItem}>
-              <Text style={styles.CardItemTitle}>Tiempo</Text>
+              <Text style={styles.CardItemTitle}>Time</Text>
               <Text style={styles.CardItemSubTitle}>{item.time}</Text>
             </View>
+            <View style={styles.CardItem}>
+              <Text style={styles.CardItemTitle}>Date</Text>
+              <Text style={styles.CardItemSubTitle}>{item.datetime}</Text>
+            </View>
           </View>
+          <Image source={{uri: item.img}} style={styles.CardImage} />
         </View>
       </TouchableOpacity>
     );
@@ -62,31 +63,41 @@ const styles = StyleSheet.create({
   FlatList: {
     width: '100%',
     paddingTop: 10,
+    paddingBottom: 0,
+    backgroundColor: 'white',
   },
   Label: {
     fontSize: 24,
   },
   Card: {
-    borderStyle: 'solid',
-    borderRadius: 10,
+    borderRadius: 12,
     borderColor: 'white',
-    marginBottom: 10,
-    marginLeft: 5,
-    marginRight: 5,
-
-    backgroundColor: 'white',
+    marginBottom: 20,
+    marginLeft: 10,
+    marginRight: 10,
+    backgroundColor: '#2ecc71',
+  },
+  CardImage: {
+    height: 100,
+    width: '100%',
+    borderTopRightRadius: 12,
+    borderTopLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    borderBottomLeftRadius: 12,
   },
   CardTitle: {
+    color: 'white',
     marginLeft: 20,
-    fontSize: 18,
+    fontSize: 25,
+    fontWeight: 'bold',
     paddingTop: 10,
     paddingBottom: 10,
   },
   CardItemContainer: {
     flexDirection: 'row',
     marginLeft: 20,
+    marginRight: 20,
     justifyContent: 'space-between',
-    width: '50%',
     paddingBottom: 10,
   },
   CardItem: {
@@ -94,11 +105,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   CardItemTitle: {
-    fontSize: 10,
-    color: 'grey',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.5)',
   },
   CardItemSubTitle: {
     fontSize: 18,
+    color: 'white',
   },
 });
 

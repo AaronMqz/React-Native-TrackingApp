@@ -1,5 +1,6 @@
 import React, {useEffect, useReducer} from 'react';
 import {getDistance} from 'geolib';
+import moment from 'moment';
 
 import useBackground from '../hooks/useBackground';
 import useTimerBackground from '../hooks/useTimerBackground';
@@ -10,6 +11,7 @@ const initialState = {
   routeCoordinates: [],
   distanceTravelled: 0,
   timing: 0,
+  datetime: '',
   prevLatLng: {},
   startTracking: false,
   status: {},
@@ -58,7 +60,8 @@ const locationReducer = (state, {type, payload}) => {
         prevLatLng: {latitude: state.latitude, longitude: state.longitude},
       };
     case START_TRACKING:
-      return {...state, startTracking: true};
+      let createDateTime = moment().format('MM/DD/YY');
+      return {...state, startTracking: true, datetime: createDateTime};
     case STOP_TRACKING:
       return {...state, startTracking: false};
     case START_TIMING:
