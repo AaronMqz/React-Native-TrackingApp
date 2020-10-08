@@ -1,4 +1,5 @@
 import React from 'react';
+import {StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {Provider} from 'react-redux';
 
@@ -20,5 +21,6 @@ let WithStore = () => (
 );
 
 export default function App() {
+  StatusBar.setBarStyle('dark-content', true);
   return <WithStore />;
 }

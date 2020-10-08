@@ -4,16 +4,14 @@ import {
   StyleSheet,
   View,
   Text,
-  Button,
-  TextInput,
   TouchableOpacity,
-  Modal,
-  TouchableHighlight,
 } from 'react-native';
 import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import Map from '../components/Map';
+import ModalTimer from '../components/ModalTimer';
+import ModalSave from '../components/ModalSave';
 import useLocation from '../hooks/useLocation';
 import {saveRoutesAction} from '../redux/routesDuck';
 
@@ -26,43 +24,57 @@ const TrackingMap = ({saveRoutesAction}) => {
   } = useLocation();
   const [toogle, setToggle] = useState(true);
   const mapRef = useRef();
-  const [modalVisible, setModalVisible] = useState(false);
-  const [newRouteTitle, setNewRouteTitle] = useState('');
+  const [startModalVisible, setStartModalVisible] = useState(false);
+  const [saveModalVisible, setSaveModalVisible] = useState(false);
+
+  const handleStartTracking = () => {
+    startTracking();
+    setStartModalVisible(false);
+  };
+
+  const handleStopTracking = () => {
+    stopTracking();
+    setSaveModalVisible(true);
+  };
+
+  const handleSaveTracking = (newRouteTitle) => {
+    // Take snapShot of the tracking
+    // Works for iOS and Android
+    mapRef.current.takeSnapShot((data) => {
+      let mapRoute = {
+        title: newRouteTitle,
+        distance: stateLocation.distanceTravelled,
+        time: stateLocation.timing,
+        img: data,
+        routes: stateLocation.routeCoordinates,
+        datetime: stateLocation.datetime,
+      };
+      saveRoutesAction(mapRoute);
+      clearTracking();
+      setSaveModalVisible(!saveModalVisible);
+    });
+    /*
+    // Only works for iOS
+    // Error in Android :(
+    mapRef.current.takeSnapShot((data) => {
+      let mapRoute = {
+        title: 'test',
+        distance: stateLocation.distanceTravelled,
+        time: '3min',
+        img: data,
+        routes: stateLocation.routeCoordinates,
+      };
+      saveRoutesAction(mapRoute);
+      clearTracking();
+    });*/
+  };
 
   const handleButton = () => {
     setToggle(!toogle);
     if (toogle) {
-      startTracking();
+      setStartModalVisible(true);
     } else {
-      stopTracking();
-      // Take snapShot of the tracking
-      // Works for iOS and Android
-      /*mapRef.current.takeSnapShot((data) => {
-        let mapRoute = {
-          title: 'test',
-          distance: stateLocation.distanceTravelled,
-          time: '3min',
-          img: data,
-          routes: stateLocation.routeCoordinates,
-        };
-        saveRoutesAction(mapRoute);
-        clearTracking();
-      });*/
-      setModalVisible(true);
-      /*
-      // Only works for iOS
-      // Error in Android :(
-      mapRef.current.takeSnapShot((data) => {
-        let mapRoute = {
-          title: 'test',
-          distance: stateLocation.distanceTravelled,
-          time: '3min',
-          img: data,
-          routes: stateLocation.routeCoordinates,
-        };
-        saveRoutesAction(mapRoute);
-        clearTracking();
-      });*/
+      handleStopTracking();
     }
   };
 
@@ -94,51 +106,14 @@ const TrackingMap = ({saveRoutesAction}) => {
         }}>
         <Icon name={'location-arrow'} size={22} color={'#00a680'} />
       </TouchableOpacity>
-      <Modal visible={modalVisible} animationType="slide">
-        <View style={styles.ModalContainer}>
-          <View style={styles.ModalLabelContainer}>
-            <TextInput
-              style={styles.ModalTextInput}
-              placeholder={'New Route Name'}
-              placeholderTextColor={'grey'}
-              defaultValue={'New Route Name'}
-              value={newRouteTitle}
-              onChangeText={(text) => setNewRouteTitle(text)}
-            />
-          </View>
-          <View style={styles.ModalLabelContainer}>
-            <Text style={styles.ModalLabel}>Distance</Text>
-            <Text style={styles.ModalLabelValue}>
-              {stateLocation.distanceTravelled}
-            </Text>
-            <Text>km</Text>
-          </View>
-          <View style={styles.ModalLabelContainer}>
-            <Text style={styles.ModalLabel}>Time</Text>
-            <Text style={styles.ModalLabelValue}>{stateLocation.timing}</Text>
-            <Text>h:mm:ss</Text>
-          </View>
-          <TouchableHighlight
-            style={styles.ModalSave}
-            onPress={() => {
-              mapRef.current.takeSnapShot((data) => {
-                let mapRoute = {
-                  title: newRouteTitle,
-                  distance: stateLocation.distanceTravelled,
-                  time: stateLocation.timing,
-                  img: data,
-                  routes: stateLocation.routeCoordinates,
-                  datetime: stateLocation.datetime,
-                };
-                saveRoutesAction(mapRoute);
-                clearTracking();
-                setModalVisible(!modalVisible);
-              });
-            }}>
-            <Text style={styles.ModalSaveText}>Save</Text>
-          </TouchableHighlight>
-        </View>
-      </Modal>
+      {startModalVisible && <ModalTimer onClose={handleStartTracking} />}
+      {saveModalVisible && (
+        <ModalSave
+          onSave={handleSaveTracking}
+          distanceTravelled={stateLocation.distanceTravelled}
+          timing={stateLocation.timing}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -160,20 +135,38 @@ const styles = StyleSheet.create({
     width: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    bottom: 30,
-    right: 10,
+    bottom: 60,
+    right: 60,
     borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 10,
   },
   Header: {
     position: 'absolute',
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    width: '90%',
+    backgroundColor: 'white',
+    width: '100%',
     height: 70,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    top: 20,
+    top: 0,
+    borderBottomRightRadius: 14,
+    borderBottomLeftRadius: 14,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 10,
   },
   HeaderSection: {
     flexDirection: 'column',
@@ -183,7 +176,7 @@ const styles = StyleSheet.create({
   },
   HeaderLabel: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 25,
   },
   HeaderLabelSubtitle: {
     fontSize: 12,
@@ -197,46 +190,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     bottom: 30,
-  },
-  ModalContainer: {
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  ModalLabelContainer: {
-    alignItems: 'center',
-    paddingTop: 50,
-    paddingBottom: 20,
-    width: '90%',
-  },
-  ModalLabel: {
-    fontSize: 20,
-  },
-  ModalLabelValue: {
-    fontSize: 50,
-    fontWeight: 'bold',
-  },
-  ModalTextInput: {
-    borderBottomWidth: 2,
-    borderColor: '#2ecc71',
-    width: '90%',
-    textAlign: 'center',
-    fontSize: 20,
-  },
-  ModalSave: {
-    position: 'absolute',
-    bottom: 20,
-    height: 55,
-    width: '90%',
-    backgroundColor: '#2ecc71',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-  },
-  ModalSaveText: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: '400',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 10,
   },
 });
 
