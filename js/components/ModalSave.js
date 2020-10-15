@@ -28,7 +28,7 @@ const ModalSave = ({onSave, distanceTravelled, timing}) => {
         <View style={styles.ModalLabelContainer}>
           <Text style={styles.ModalLabel}>Distance</Text>
           <Text style={styles.ModalLabelValue}>{distanceTravelled}</Text>
-          <Text>km</Text>
+          <Text>{distanceTravelled === 1000 ? 'km' : 'm'}</Text>
         </View>
         <View style={styles.ModalLabelContainer}>
           <Text style={styles.ModalLabel}>Time</Text>
